@@ -64,6 +64,16 @@ class LSTM(DeepTLPredictor):
         x_train, _, _ = self._str2dataset("train")
         return x_train.shape[2]
 
+
+    def extract_features(self, dataset, file):
+        x, y, _ = self._str2dataset(dataset)
+        self.model.load_state_dict(torch.load(file))
+        self.model.eval()
+        features = self.model.encoder(torch.Tensor(x).cuda())[0].detach().cpu().numpy()
+        features = features.reshape(features.shape[0], -1)
+
+        return [features, y]
+
     class LSTM_Module(nn.Module):
 
         def __init__(self, n_in, neurons, dropout_weights, dropout_layer, domain_adversarial=False, n_domains=1):

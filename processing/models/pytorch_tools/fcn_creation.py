@@ -1,5 +1,5 @@
 import numpy as np
-from torch.nn import __init__ as nn
+import torch.nn as nn
 
 from processing.models.pytorch_tools.gradient_reversal import RevGrad
 

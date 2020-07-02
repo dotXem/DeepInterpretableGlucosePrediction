@@ -13,7 +13,7 @@ class LSTM_Gal(nn.Module):
 
     def __init__(self, input_size, hidden_size, dropout=0.0, batch_first=True):
         """Initialize params."""
-        super(LSTM_Gal, self).__init__()
+        super().__init__()
         self.input_size = input_size
         self.hidden_size = hidden_size
         self.num_layers = 1

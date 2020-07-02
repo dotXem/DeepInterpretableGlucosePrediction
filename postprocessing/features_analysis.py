@@ -63,7 +63,10 @@ class FeaturesAnalyzer():
         :param learning_rate: learning rate
         :return: tsne features in the shape (n_samples, tsne_components)
         """
-        pca_features = PCA(pca_components, random_state=misc.constants.seed).fit_transform(features)
+        if features.shape[1] > pca_components:
+            pca_features = PCA(pca_components, random_state=misc.constants.seed).fit_transform(features)
+        else :
+            pca_features = features
         tsne_features = TSNE(tsne_components, perplexity=perplexity, learning_rate=learning_rate,
                              random_state=misc.constants.seed).fit_transform(pca_features)
 

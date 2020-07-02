@@ -10,7 +10,7 @@ import torch.nn as nn
 from .pytorch_tools.training import fit, predict
 
 
-class LSTM_GLYFE(Predictor):
+class LSTM_ICPRAI(Predictor):
     def fit(self):
         # get training data
         x_train, y_train, t_train = self._str2dataset("train")
@@ -79,11 +79,16 @@ class LSTM_GLYFE(Predictor):
             #     self.lstm = nn.Sequential(*self.lstm)
             #     self.dropouts = nn.Sequential(*self.dropouts)
             # else:
-            self.lstm = nn.LSTM(n_in, neurons[0], len(neurons), dropout=dropout_layer, batch_first=True)
+
+
+            self.embeddings = nn.Linear(n_in, 64, bias=False)
+
+            self.lstm = nn.LSTM(64, neurons[0], len(neurons), dropout=dropout_layer, batch_first=True)
 
             self.linear = nn.Linear(neurons[-1], 1)
 
         def forward(self, xb):
+            xb = self.embeddings(xb)
             if self.lstm.__class__.__name__ == "LSTM":
                 xb, _ = self.lstm(xb)
             else:

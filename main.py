@@ -15,7 +15,7 @@ def main_target_training(source_dataset, target_dataset, target_subject, Model, 
     raw_results = make_predictions_tl(target_subject, Model, params, ph_f, train, valid, test,
                                       tl_mode="target_training", eval_mode=eval_mode)
 
-    evaluation(raw_results, scalers, source_dataset, target_dataset, target_subject, Model, params, exp, plot,
+    return evaluation(raw_results, scalers, source_dataset, target_dataset, target_subject, Model, params, exp, plot,
                "target_training")
 
 
@@ -39,7 +39,7 @@ def main_target_global(source_dataset, target_dataset, target_subject, Model, pa
     raw_results = make_predictions_tl(target_subject, Model, params, ph_f, train, valid, test,
                                       weights_file=weights_file, tl_mode="target_global", eval_mode=eval_mode)
 
-    evaluation(raw_results, scalers, source_dataset, target_dataset, target_subject, Model, params, exp, plot,
+    return evaluation(raw_results, scalers, source_dataset, target_dataset, target_subject, Model, params, exp, plot,
                "target_global")
 
 
@@ -53,7 +53,7 @@ def main_target_finetuning(source_dataset, target_dataset, target_subject, Model
     raw_results = make_predictions_tl(target_subject, Model, params, ph_f, train, valid, test,
                                       weights_file=weights_file, tl_mode="target_finetuning", eval_mode=eval_mode)
 
-    evaluation(raw_results, scalers, source_dataset, target_dataset, target_subject, Model, params, exp, plot,
+    return evaluation(raw_results, scalers, source_dataset, target_dataset, target_subject, Model, params, exp, plot,
                "target_finetuning")
 
 
@@ -65,9 +65,12 @@ def evaluation(raw_results, scalers, source_dataset, target_dataset, target_subj
     results = ResultsSubject(Model.__name__, exp, ph, target_dataset, target_subject, params=params,
                              results=raw_results)
 
-    printd(results.compute_mean_std_results())
+    res_mean = results.compute_mean_std_results()
+    printd(res_mean)
     if plot:
         results.plot(0)
+
+    return res_mean
 
 
 def compute_weights_file(Model, source_dataset, target_dataset, target_subject, weights_exp):
