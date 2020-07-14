@@ -95,6 +95,6 @@ class LSTM(DeepTLPredictor):
             if self.domain_classifier is not None:
                 # domain = self.domain_classifier(self.GradReverse.apply(features[:,-1]))
                 domain = self.domain_classifier(features[:,-1])
-                return prediction.squeeze(), domain.squeeze()
+                return prediction.reshape((-1)), domain
             else:
-                return prediction.squeeze()
+                return prediction.reshape((-1))

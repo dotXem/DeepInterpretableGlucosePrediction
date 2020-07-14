@@ -12,8 +12,7 @@ from postprocessing.results import ResultsSubject
 def main_target_training(source_dataset, target_dataset, target_subject, Model, params, eval_mode, exp, plot):
     hist_f = params["hist"] // freq
     train, valid, test, scalers = preprocessing(target_dataset, target_subject, ph_f, hist_f, day_len_f)
-    raw_results = make_predictions_tl(target_subject, Model, params, ph_f, train, valid, test,
-                                      tl_mode="target_training", eval_mode=eval_mode)
+    raw_results = make_predictions_tl(target_subject, Model, params, ph_f, train, valid, test, eval_mode=eval_mode, fit=True, save_model_file=None)
 
     return evaluation(raw_results, scalers, source_dataset, target_dataset, target_subject, Model, params, exp, plot,
                "target_training")
@@ -25,8 +24,8 @@ def main_source_training(source_dataset, target_dataset, target_subject, Model, 
 
     train, valid, test, scalers = preprocessing_source_multi(source_dataset, target_dataset, target_subject, ph_f,
                                                              hist_f, day_len_f)
-    make_predictions_tl(target_subject, Model, params, ph_f, train, valid, test, tl_mode="source_training",
-                        save_model=save_file, eval_mode=eval_mode)
+    make_predictions_tl(target_subject, Model, params, ph_f, train, valid, test,
+                         eval_mode=eval_mode, fit=True, save_model_file=save_file)
 
 
 def main_target_global(source_dataset, target_dataset, target_subject, Model, params, weights_exp, eval_mode, exp,
@@ -37,21 +36,26 @@ def main_target_global(source_dataset, target_dataset, target_subject, Model, pa
     train, valid, test, scalers = preprocessing(target_dataset, target_subject, ph_f, hist_f, day_len_f)
 
     raw_results = make_predictions_tl(target_subject, Model, params, ph_f, train, valid, test,
-                                      weights_file=weights_file, tl_mode="target_global", eval_mode=eval_mode)
+                                      weights_file=weights_file, eval_mode=eval_mode, fit=False, save_model_file=None)
 
     return evaluation(raw_results, scalers, source_dataset, target_dataset, target_subject, Model, params, exp, plot,
                "target_global")
 
 
 def main_target_finetuning(source_dataset, target_dataset, target_subject, Model, params, weights_exp, eval_mode, exp,
-                           plot):
+                           plot, save=False):
     hist_f = params["hist"] // freq
     weights_file = compute_weights_file(Model, source_dataset, target_dataset, target_subject, weights_exp)
+    if save:
+        save_file = compute_weights_file(Model, source_dataset, target_dataset, target_subject, weights_exp + "_ft")
+    else:
+        save_file = None
+
 
     train, valid, test, scalers = preprocessing(target_dataset, target_subject, ph_f, hist_f, day_len_f)
 
     raw_results = make_predictions_tl(target_subject, Model, params, ph_f, train, valid, test,
-                                      weights_file=weights_file, tl_mode="target_finetuning", eval_mode=eval_mode)
+                                      weights_file=weights_file, eval_mode=eval_mode, fit=True, save_model_file=save_file)
 
     return evaluation(raw_results, scalers, source_dataset, target_dataset, target_subject, Model, params, exp, plot,
                "target_finetuning")
@@ -116,7 +120,8 @@ def process_main_args(args):
         main_target_global(args.source_dataset, args.target_dataset, args.target_subject, Model, params_ft,
                            args.weights, args.eval_mode, args.exp, args.plot)
         main_target_finetuning(args.source_dataset, args.target_dataset, args.target_subject, Model, params_ft,
-                               args.weights, args.eval_mode, args.exp, args.plot)
+                               args.weights, args.eval_mode, args.exp, args.plot, args.save)
+
 
 
 if __name__ == "__main__":
@@ -170,6 +175,7 @@ if __name__ == "__main__":
     parser.add_argument("--log", type=str)
     parser.add_argument("--exp", type=str)
     parser.add_argument("--plot", type=bool)
+    parser.add_argument("--save", type=bool)
     args = parser.parse_args()
 
     process_main_args(args)

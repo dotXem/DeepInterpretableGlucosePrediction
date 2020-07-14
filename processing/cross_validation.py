@@ -3,7 +3,7 @@ from misc.utils import printd
 from postprocessing.metrics.rmse import RMSE
 from processing.hyperparameters_tuning import compute_coarse_params_grid, compute_refined_params_grid
 
-def make_predictions_tl(subject, model_class, params, ph, train, valid, test, weights_file=None, tl_mode="target_training", save_model=None, eval_mode="valid"):
+def make_predictions_tl(subject, model_class, params, ph, train, valid, test, weights_file=None, eval_mode="valid", fit=True, save_model_file=None):
     """
     Identical to make_predictions but for model that are transfered (use of weight file
     """
@@ -14,11 +14,11 @@ def make_predictions_tl(subject, model_class, params, ph, train, valid, test, we
         if weights_file:
             model.load(weights_file)
 
-        if not tl_mode == "target_global":
+        if fit:
             model.fit()
 
-            if tl_mode == "source_training":
-                model.save(save_model)
+            if save_model_file is not None:
+                model.save(save_model_file)
 
         res = model.predict(dataset=eval_mode)
         results.append(res)

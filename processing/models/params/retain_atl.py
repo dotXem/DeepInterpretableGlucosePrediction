@@ -1,7 +1,7 @@
 parameters = {
-    "domain_adversarial": False,
-    "da_lambda": 0, #10**(-0.75),
-    "domain_weights": False,
+    "domain_adversarial": True,
+    "da_lambda": 10**(-1.75),
+    "domain_weights": True,
     "hist": 180,
 
     # model hyperparameters
@@ -17,7 +17,7 @@ parameters = {
     "dropout_layer": 0.0,
     "epochs": 2,
     "batch_size": 50,
-    "lr": 1e-4,
+    "lr": 1e-3,
     "l2": 0.0,
     # "l2": 1e-4,
     "patience": 25,
