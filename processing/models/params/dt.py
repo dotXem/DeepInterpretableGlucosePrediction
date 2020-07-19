@@ -1,14 +1,12 @@
-import numpy as np
 parameters = {
     "hist": 180,
 
     "n_estimators": 1,
     "max_depth": None,
-    "min_samples_split": np.arange(1e1,1e4,10).astype(int),
+
+    """ 100 for idiab and 500 for ohio """
+    # "min_samples_split": 100,  # IDIAB
+    "min_samples_split": 500,  # OhioT1DM
 }
 
-search = {
-    # "n_estimators": ["list",4,3],
-    # "max_depth": ["list",4,3],
-    "min_samples_split": ["list",4,3],
-}
+search = {}

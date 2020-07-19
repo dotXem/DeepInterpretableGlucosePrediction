@@ -62,3 +62,9 @@ def printd(*msg):
     date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     print(date, " ".join(str(v) for v in msg))
     sys.stdout.flush()
+
+def print_latex(mean, std, label=""):
+    print(
+        "\\textbf{" + label + "} & " + " & ".join(
+            ["{0:.2f} \\scriptsize{{({1:.2f})}}".format(mean_, std_) for mean_, std_ in zip(mean, std)])
+        + "\\\\")

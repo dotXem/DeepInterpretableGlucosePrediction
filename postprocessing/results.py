@@ -1,3 +1,4 @@
+from misc.utils import print_latex
 import pandas as pd
 import os
 import numpy as np
@@ -63,21 +64,20 @@ class ResultsDataset():
         :return:
         """
         mean, std = self.compute_results()
-        if table == "p_ega":
-            p_ega_keys = ["P_EGA_A+B", "P_EGA_A", "P_EGA_B", "P_EGA_C", "P_EGA_D", "P_EGA_E"]
-            mean = [mean[k] * 100 for k in p_ega_keys]
-            std = [std[k] * 100 for k in p_ega_keys]
-        elif table == "acc":
-            acc_keys = ["RMSE", "MAPE"]
-            mean = [mean[k] for k in acc_keys]
-            std = [std[k] for k in acc_keys]
+        if table == "cg_ega":
+            keys = ["CG_EGA_AP_hypo", "CG_EGA_BE_hypo", "CG_EGA_EP_hypo", "CG_EGA_AP_eu", "CG_EGA_BE_eu", "CG_EGA_EP_eu", "CG_EGA_AP_hyper", "CG_EGA_BE_hyper", "CG_EGA_EP_hyper"]
+            mean = [mean[k] * 100 for k in keys]
+            std = [std[k] * 100 for k in keys]
+        elif table == "general":
+            acc_keys = ["RMSE", "MAPE", "CG_EGA_AP", "CG_EGA_BE", "CG_EGA_EP"]
+            mean = [mean[k] if k not in ["CG_EGA_AP", "CG_EGA_BE", "CG_EGA_EP"] else mean[k] * 100 for k in acc_keys]
+            std = [std[k] if k not in ["CG_EGA_AP", "CG_EGA_BE", "CG_EGA_EP"] else std[k] * 100 for k in acc_keys]
 
-        str = " & ".join(["{0:.2f} \\scriptsize{{({1:.2f})}}".format(mean_, std_) for mean_, std_ in zip(mean, std)])
-        print(str)
+        print_latex(mean, std, label=self.model)
+
 
 
 class ResultsDatasetTransfer(ResultsDataset):
-    # TODO remove ?
     """ Convenient class, child of ResultsDataset, that overwrites the to_latex function """
 
     def __init__(self, model, experiment, ph, source_dataset, target_dataset):
@@ -92,17 +92,16 @@ class ResultsDatasetTransfer(ResultsDataset):
         :return:
         """
         mean, std = self.compute_results()
-        if table == "p_ega":
-            p_ega_keys = ["P_EGA_A+B", "P_EGA_A", "P_EGA_B", "P_EGA_C", "P_EGA_D", "P_EGA_E"]
-            mean = [mean[k] * 100 for k in p_ega_keys]
-            std = [std[k] * 100 for k in p_ega_keys]
-        elif table == "acc":
-            acc_keys = ["RMSE", "MAPE"]
-            mean = [mean[k] for k in acc_keys]
-            std = [std[k] for k in acc_keys]
+        if table == "cg_ega":
+            keys = ["CG_EGA_AP_hypo", "CG_EGA_BE_hypo", "CG_EGA_EP_hypo", "CG_EGA_AP_eu", "CG_EGA_BE_eu", "CG_EGA_EP_eu", "CG_EGA_AP_hyper", "CG_EGA_BE_hyper", "CG_EGA_EP_hyper"]
+            mean = [mean[k] * 100 for k in keys]
+            std = [std[k] * 100 for k in keys]
+        elif table == "general":
+            acc_keys = ["RMSE", "MAPE", "CG_EGA_AP", "CG_EGA_BE", "CG_EGA_EP"]
+            mean = [mean[k] if k not in ["CG_EGA_AP", "CG_EGA_BE", "CG_EGA_EP"] else mean[k] * 100 for k in acc_keys]
+            std = [std[k] if k not in ["CG_EGA_AP", "CG_EGA_BE", "CG_EGA_EP"] else std[k] * 100 for k in acc_keys]
 
-        str = " & ".join(["{0:.2f} \\scriptsize{{({1:.2f})}}".format(mean_, std_) for mean_, std_ in zip(mean, std)])
-        print(str)
+        print_latex(mean, std, label=self.model)
 
 
 class ResultsSubject():
@@ -198,6 +197,7 @@ class ResultsSubject():
         mase_score = [mase.MASE(res_day, self.ph, self.freq) for res_day in results]
         tg_score = [time_lag.time_gain(res_day, self.ph, self.freq, "mse") for res_day in results]
         cg_ega_score = np.array([cg_ega.CG_EGA(res_day, self.freq).simplified() for res_day in results])
+        cg_ega_score2 = np.array([cg_ega.CG_EGA(res_day, self.freq).reduced() for res_day in results])
         p_ega_score = np.array([p_ega.P_EGA(res_day, self.freq).mean() for res_day in results])
         p_ega_a_plus_b_score = [p_ega.P_EGA(res_day, self.freq).a_plus_b() for res_day in results]
         r_ega_score = np.array([r_ega.R_EGA(res_day, self.freq).mean() for res_day in results])
@@ -208,6 +208,9 @@ class ResultsSubject():
             "MAPE": mape_score,
             "MASE": mase_score,
             "TG": tg_score,
+            "CG_EGA_AP": cg_ega_score2[:, 0],
+            "CG_EGA_BE": cg_ega_score2[:, 1],
+            "CG_EGA_EP": cg_ega_score2[:, 2],
             "CG_EGA_AP_hypo": cg_ega_score[:, 0],
             "CG_EGA_BE_hypo": cg_ega_score[:, 1],
             "CG_EGA_EP_hypo": cg_ega_score[:, 2],

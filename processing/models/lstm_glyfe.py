@@ -1,4 +1,3 @@
-# from .pytorch_tools.lstm_variants import LSTM_Gal
 from torch.utils.data import TensorDataset
 import torch
 from misc.utils import printd
@@ -68,17 +67,6 @@ class LSTM_GLYFE(Predictor):
         def __init__(self, n_in, neurons, dropout_weights, dropout_layer):
             super().__init__()
 
-            # use different LSTM modules depending on the dropout settings
-            # if not dropout_weights == 0.0:
-            #     self.lstm = [LSTM_Gal(n_in, neurons[0], dropout_weights, batch_first=True).cuda()]
-            #     self.dropouts = []
-            #     for i in range(len(neurons[1:])):
-            #         self.dropouts.append(nn.Dropout(dropout_layer))
-            #         self.lstm.append(LSTM_Gal(neurons[i], neurons[i + 1], dropout_weights, batch_first=True).cuda())
-            #     self.dropouts.append(nn.Dropout(0.0))
-            #     self.lstm = nn.Sequential(*self.lstm)
-            #     self.dropouts = nn.Sequential(*self.dropouts)
-            # else:
             self.lstm = nn.LSTM(n_in, neurons[0], len(neurons), dropout=dropout_layer, batch_first=True)
 
             self.linear = nn.Linear(neurons[-1], 1)

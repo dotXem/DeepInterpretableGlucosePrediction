@@ -1,20 +1,11 @@
 import misc.constants as cs
 from processing.models.predictor import Predictor
 from sklearn.tree import DecisionTreeRegressor
-
+import misc.constants as cs
+import os
+from joblib import dump, load
 
 class DT(Predictor):
-    """
-    The SVR predictor is based on Support Vector Regression.
-    Parameters:
-        - self.params["hist"], history length
-        - self.params["kernel"], kernel to be used
-        - self.params["C"], loss
-        - self.params["epsilon"], wideness of the no-penalty tube
-        - self.params["gamma"], kernel coefficient
-        - self.params["shrinking"], wether or not to use the shrinkin heuristic
-    """
-
     def fit(self):
         # get training data
         x, y, t = self._str2dataset("train")
@@ -39,3 +30,12 @@ class DT(Predictor):
         y_true = y.values
 
         return self._format_results(y_true, y_pred, t)
+
+
+    def save(self, file):
+        if not os.path.exists(os.path.dirname(file)):
+            os.makedirs(os.path.dirname(file))
+        dump(self.model,filename=file)
+
+    def load(self, file):
+        self.model = load(filename=file)

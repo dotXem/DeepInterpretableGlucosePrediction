@@ -1,5 +1,3 @@
-import pandas as pd
-import numpy as np
 import torch
 import os
 from processing.models.deep_predictor import DeepPredictor
@@ -46,7 +44,6 @@ class RETAIN(DeepPredictor):
         # create the model
         self.model.load_state_dict(torch.load(self.checkpoint_file))
 
-        # y_true, y_pred = predict_double_y(self.model, ds)
         y_true, y_pred = predict(self.model, ds)
         results = self._format_results(y_true, y_pred, t)
 
@@ -68,22 +65,6 @@ class RETAIN(DeepPredictor):
     def _reshape(self, data):
         x, y, t = super()._reshape(data)
         return x, y, t
-
-    def get_weights_prediction(self, dataset):
-        x, y, t = self._str2dataset(dataset)
-        ds = self._to_tensor_ds(x, y)
-
-        emb = self.model.compute_embeddings(ds[0])
-        alpha, beta = self.model.compute_alpha_beta(emb)
-
-        weights = {
-            "input": x,
-            "w_emb": self.model.embeddings.weight,
-            "alpha": alpha,
-            "beta": beta,
-            "w_out": self.model.output.weight
-        }
-
 
     def extract_features(self, dataset, file):
         x, y, _ = self._str2dataset(dataset)
@@ -111,11 +92,9 @@ class RETAIN(DeepPredictor):
             self.emb_dropout = nn.Dropout(emb_dropout)
             self.ctx_dropout = nn.Dropout(ctx_dropout)
 
-            from processing.models.pytorch_tools.sparsemax import Sparsemax
             self.alpha = nn.Sequential(
                 nn.Linear(n_hidden_rnn *(1 + int(bidirectional)),1,bias=True),
                 nn.Softmax(dim=1)
-                # Sparsemax(dim=1)
             )
 
             self.beta = nn.Sequential(

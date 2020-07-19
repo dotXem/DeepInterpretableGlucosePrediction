@@ -1,5 +1,5 @@
 import misc.constants as cs
-from main import *
+from main_tl import *
 from misc.utils import locate_search
 from processing.hyperparameters_tuning import compute_coarse_params_grid
 

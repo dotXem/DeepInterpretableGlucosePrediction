@@ -32,7 +32,7 @@ class Predictor(ABC):
 
         t = data["datetime"]
         y = data["y"]
-        x = data.drop(["y","datetime"], axis=1)
+        x = data.drop(["y", "datetime", "time"], axis=1)
 
         return x, y, t
 
@@ -48,4 +48,4 @@ class Predictor(ABC):
             sys.exit(-1)
 
     def _format_results(self, y_true, y_pred, t):
-        return pd.DataFrame(data=np.c_[y_true,y_pred],index=pd.DatetimeIndex(t.values),columns=["y_true", "y_pred"])
+        return pd.DataFrame(data=np.c_[y_true, y_pred], index=pd.DatetimeIndex(t.values), columns=["y_true", "y_pred"])

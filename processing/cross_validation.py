@@ -26,7 +26,7 @@ def make_predictions_tl(subject, model_class, params, ph, train, valid, test, we
             break
     return results
 
-def make_predictions(subject, model_class, params, ph, train, valid, test, mode="valid"):
+def make_predictions(subject, model_class, params, ph, train, valid, test, mode="valid",save_model_file=None):
     """
     For every train, valid, test fold, fit the given model with params at prediciton horizon on the training set,
     and make predictions on either the validation or testing set
@@ -38,14 +38,19 @@ def make_predictions(subject, model_class, params, ph, train, valid, test, mode=
     :param valid: validation sets
     :param test: testing sets
     :param mode: on which set the model is tested (either "valid" or "test")
+    :param save_model_file: enables the saving of the model object (if implemented)
     :return: array of ground truths/predictions dataframe
     """
     results = []
-    for train_i, valid_i, test_i in zip(train, valid, test):
+    for i, (train_i, valid_i, test_i) in enumerate(zip(train, valid, test)):
         model = model_class(subject, ph, params, train_i, valid_i, test_i)
         model.fit()
         res = model.predict(dataset=mode)
         results.append(res)
+
+        if save_model_file is not None:
+            model.save(save_model_file + "_" + str(i))
+
         if mode == "valid":
             break
     return results

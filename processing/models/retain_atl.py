@@ -1,13 +1,10 @@
-import pandas as pd
 import numpy as np
 from processing.models.pytorch_tools.gradient_reversal import RevGrad
 import torch
 import os
-from processing.models.deep_predictor import DeepPredictor
 from processing.models.deep_tl_predictor import DeepTLPredictor
 import torch.nn as nn
 from processing.models.pytorch_tools.training import fit, predict
-
 
 class RETAIN_ATL(DeepTLPredictor):
     def __init__(self, subject, ph, params, train, valid, test):
@@ -78,12 +75,6 @@ class RETAIN_ATL(DeepTLPredictor):
             os.makedirs(os.path.dirname(file))
         torch.save(no_da_retain.state_dict(), file)
 
-    # def save(self, save_file):
-    #     self.model.load_state_dict(torch.load(self.checkpoint_file))
-    #     if not os.path.exists(os.path.dirname(save_file)):
-    #         os.makedirs(os.path.dirname(save_file))
-    #     torch.save(self.model.state_dict(), save_file)
-
     def _compute_input_shape(self):
         x_train, _, _ = self._str2dataset("train")
         return x_train.shape[2]
@@ -139,21 +130,6 @@ class RETAIN_ATL(DeepTLPredictor):
         contrib_an = absolute_contrib / sum_contrib
         return contrib_an
 
-    def get_weights_prediction(self, dataset):
-        x, y, t = self._str2dataset(dataset)
-        ds = self._to_tensor_ds(x, y)
-
-        emb = self.model.compute_embeddings(ds[0])
-        alpha, beta = self.model.compute_alpha_beta(emb)
-
-        weights = {
-            "input": x,
-            "w_emb": self.model.embeddings.weight,
-            "alpha": alpha,
-            "beta": beta,
-            "w_out": self.model.output.weight
-        }
-
     def extract_features(self, dataset, file):
         x, y, _ = self._str2dataset(dataset)
         self.model.load_state_dict(torch.load(file))
@@ -183,7 +159,6 @@ class RETAIN_ATL(DeepTLPredictor):
             self.emb_dropout = nn.Dropout(emb_dropout)
             self.ctx_dropout = nn.Dropout(ctx_dropout)
 
-            from processing.models.pytorch_tools.sparsemax import Sparsemax
             self.alpha = nn.Sequential(
                 nn.Linear(n_hidden_rnn * (1 + int(bidirectional)), 1, bias=True),
                 nn.Softmax(dim=1)

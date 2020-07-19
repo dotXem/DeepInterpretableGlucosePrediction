@@ -9,12 +9,12 @@ import misc.constants as cs
 from misc.utils import printd
 from processing.cross_validation import make_predictions, find_best_hyperparameters
 from misc.utils import locate_params, locate_model, locate_search
-
+import os
 """ This is the source code the benchmark GLYFE for glucose prediction in diabetes.
     For more infos on how to use it, go to its Github repository at: https://github.com/dotXem/GLYFE """
 
 
-def main(dataset, subject, model, params, exp, mode, log, ph, plot):
+def main(dataset, subject, model, params, exp, mode, log, ph, plot, save=False):
     printd(dataset, subject, model, params, exp, mode, log, ph, plot)
 
     # retrieve model's parameters
@@ -34,7 +34,13 @@ def main(dataset, subject, model, params, exp, mode, log, ph, plot):
     if search:
         params = find_best_hyperparameters(subject, model_class, params, search, ph_f, train, valid, test)
 
-    raw_results = make_predictions(subject, model_class, params, ph_f, train, valid, test, mode=mode)
+    if save:
+        dir = os.path.join(cs.path, "processing", "models", "weights", model_class.__name__, exp)
+        file = os.path.join(dir, model_class.__name__ + "_" + dataset + subject)
+    else:
+        file = None
+
+    raw_results = make_predictions(subject, model_class, params, ph_f, train, valid, test, mode=mode, save_model_file=file)
     """ POST-PROCESSING """
     raw_results = postprocessing(raw_results, scalers, dataset)
 
@@ -58,7 +64,7 @@ if __name__ == "__main__":
             --log: file where the standard outputs will be redirected to; default: logs stay in stdout; 
 
         Example:
-            python main.py --dataset=ohio --subject=559 --model=base --params=base --ph=30 
+            python main_tl.py --dataset=ohio --subject=559 --model=base --params=base --ph=30 
                         --exp=myexp --mode=valid --plot=1 --log=mylog
     """
 
@@ -74,6 +80,7 @@ if __name__ == "__main__":
     parser.add_argument("--mode", type=str)
     parser.add_argument("--plot", type=int)
     parser.add_argument("--log", type=str)
+    parser.add_argument("--save", type=int)
     args = parser.parse_args()
 
     # compute stdout redirection to log file
@@ -88,4 +95,5 @@ if __name__ == "__main__":
          exp=args.exp,
          dataset=args.dataset,
          mode=args.mode,
-         plot=args.plot)
+         plot=args.plot,
+         save=args.save)

@@ -1,4 +1,4 @@
-from main import process_main_args
+from main_tl import process_main_args
 from misc.datasets import datasets
 import argparse
 

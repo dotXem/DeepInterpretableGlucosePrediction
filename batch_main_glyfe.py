@@ -25,7 +25,7 @@ def batch_main():
             --log: file where the standard outputs will be redirected to; default: logs stay in stdout;
 
         Example:
-            python main.py --dataset=ohio --model=base --params=base --ph=30
+            python main_tl.py --dataset=ohio --model=base --params=base --ph=30
                         --exp=myexp --mode=valid --plot=1 --log=mylog
     """
     parser = argparse.ArgumentParser()
@@ -36,6 +36,7 @@ def batch_main():
     parser.add_argument("--ph", type=int)
     parser.add_argument("--params", type=str)
     parser.add_argument("--mode", type=str)
+    parser.add_argument("--save", type=int)
     args = parser.parse_args()
 
     subjects = misc.datasets.datasets[args.dataset]["subjects"]
@@ -55,6 +56,7 @@ def batch_main():
              exp=args.exp,
              dataset=args.dataset,
              mode=args.mode,
+             save=args.save,
              plot=0)
 
 
