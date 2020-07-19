@@ -3,14 +3,14 @@ import os
 import numpy as np
 import misc
 import misc.constants as cs
-import pickle
-from pathlib import Path
 from preprocessing.preprocessing import preprocessing
-from processing.models.retain_atl import RETAIN_ATL
 from misc.utils import locate_params, locate_model
 
 
 class TreeAnalyzer():
+    """
+        Analyse tree-based models through Gini feature importance or permutation feature importance
+    """
     def __init__(self, dataset, ph, hist, experiment, model, params):
         self.dataset = dataset
         self.ph = ph // cs.freq

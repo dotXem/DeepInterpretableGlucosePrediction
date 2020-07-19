@@ -1,7 +1,5 @@
 from misc.constants import freq
 from misc.datasets import datasets
-import numpy as np
-import misc
 
 
 def postprocessing(results, scalers, dataset):

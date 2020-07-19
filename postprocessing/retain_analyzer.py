@@ -12,6 +12,14 @@ import pandas as pd
 
 
 class RetainAnalyzer():
+    """
+        Implements all the visualisation described in the publication:
+            - plot sample contribution
+            - plot mean absolute normalized contribution
+            - plot max absolute normalized contribution
+            - plot evolution of stimulti through time
+    """
+
     def __init__(self, dataset, ph, hist, experiment, params):
         self.dataset = dataset
         self.ph = ph // cs.freq
